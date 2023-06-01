@@ -3,7 +3,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Item, { ItemProps } from "./Item";
 
-const SortableItem: FC<ItemProps> = (props) => {
+type SortableItemProps = ItemProps & { noMenu?: boolean };
+
+const SortableItem: FC<SortableItemProps> = (props) => {
     const {
         isDragging,
         attributes,
@@ -17,7 +19,6 @@ const SortableItem: FC<ItemProps> = (props) => {
         transform: CSS.Transform.toString(transform),
         transition: transition || undefined,
     };
-
     return (
         <Item
             ref={setNodeRef}

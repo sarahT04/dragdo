@@ -11,7 +11,7 @@ const popoverLinks = [
 
 export default function RoutePopovers() {
     return (
-        <Popover className="relative p-2">
+        <Popover className="p-2">
             <Popover.Button className="inline-flex items-center">
                 <span>Go to</span>
                 <ChevronDownIcon
@@ -26,14 +26,14 @@ export default function RoutePopovers() {
                 leaveTo="transform scale-95 opacity-0"
             >
                 <Popover.Panel
-                    className="absolute z-10 p-2 inverse-dark-mode rounded-md flex flex-col space-y-2 [&>*]:py-1 [&>*]:px-2"
+                    className="absolute shadow-2xl z-10 p-2 inverse-dark-mode rounded-md flex flex-col space-y-2 [&>*]:py-1 [&>*]:px-2"
                 >
                     {
                         popoverLinks.map((popover) => {
                             const { id, label, title, href } = popover;
                             return (
                                 <Link href={href} title={title} key={id}
-                                    className="hover:bg-slate-700 dark:hover:bg-slate-200 rounded-md transition-colors"
+                                    className="hover:opacity-80 rounded-md transition-colors"
                                 >
                                     {label}
                                 </Link>

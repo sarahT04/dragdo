@@ -1,9 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, SetStateAction } from 'react';
 import {
     DndContext,
     closestCenter,
-    MouseSensor,
-    TouchSensor,
     DragOverlay,
     useSensor,
     useSensors,
@@ -11,37 +9,46 @@ import {
     DragEndEvent,
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
+// Touch sensor might be wrong and might produce errors.
+import { MouseSensor, TouchSensor } from '../overrides';
 import Grid from './Grid';
 import SortableItem from './SortableItem';
 import Item from './Item';
 
-export default function Container() {
-    const [items, setItems] = useState(Array.from({ length: 20 }, (_, i) => (i + 1).toString()));
-    const [activeId, setActiveId] = useState<number | null>(null);
+type StickyProps = {
+    items: stickyDataType[];
+    setItems: React.Dispatch<SetStateAction<stickyDataType[]>>;
+    activeData: stickyDataType | null;
+    setActiveData: React.Dispatch<SetStateAction<stickyDataType | null>>;
+}
+
+export default function Container({ items, setItems, activeData, setActiveData }: StickyProps) {
     const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
-        setActiveId(event.active.id as number);
-    }, []);
+        const currentActiveData = items.find((item) => item.id === event.active.id);
+        setActiveData(currentActiveData ? currentActiveData : null);
+    }, [items, setActiveData]);
+
     const handleDragEnd = useCallback((event: DragEndEvent) => {
         const { active, over } = event;
-        const { id: activeId } = active;
-        const { id: overId } = over!;
 
         if (active.id !== over?.id) {
             setItems((items) => {
-                const oldIndex = items.indexOf(activeId);
-                const newIndex = items.indexOf(overId);
+                const oldIndex = items.findIndex((item) => item.id === active.id)
+                const newIndex = items.findIndex((item) => item.id === over?.id);
 
                 return arrayMove(items, oldIndex, newIndex);
             });
         }
 
-        setActiveId(null);
-    }, []);
+        setActiveData(null);
+        // Make API call to save data here
+    }, [setActiveData, setItems]);
+
     const handleDragCancel = useCallback(() => {
-        setActiveId(null);
-    }, []);
+        setActiveData(null);
+    }, [setActiveData]);
 
     return (
         <DndContext
@@ -51,15 +58,16 @@ export default function Container() {
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragCancel}
         >
-            <SortableContext items={items} strategy={rectSortingStrategy}>
+            <SortableContext items={items} strategy={rectSortingStrategy} >
                 <Grid>
-                    {items.map((id) => (
-                        <SortableItem key={id} id={id} />
+                    {items.map((item) => (
+                        <SortableItem key={item.id} id={item.id} item={item}  />
                     ))}
+                    <SortableItem id="create new" item={items[0]} noMenu />
                 </Grid>
             </SortableContext>
             <DragOverlay adjustScale style={{ transformOrigin: '0 0 ' }}>
-                {activeId ? <Item id={activeId} isDragging /> : null}
+                {activeData ? <Item id={activeData.id} isDragging item={activeData} /> : null}
             </DragOverlay>
         </DndContext>
     );

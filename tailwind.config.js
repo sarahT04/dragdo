@@ -7,7 +7,11 @@ module.exports = {
   ],
   darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        'fluid': 'repeat(auto-fit, minmax(24rem, 1fr))',
+      }
+    },
   },
   plugins: [
     // Or with a custom prefix:

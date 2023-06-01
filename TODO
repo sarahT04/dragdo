@@ -1,4 +1,8 @@
-Find sweet spot for grid width
+use react.createcontext for onedit and onDelete also 
+for the changing datas and editing datas.
+
+STILL FIGURING OUT HOW TO USE USEREDUCER FOR TODOS
+ONCE FIGURE OUT, GOTTA SET ONE FOR THE MODAL & COLOR.
 
 SIDEBAR
 1. Create a TDL from importance / per day
