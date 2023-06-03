@@ -7,6 +7,7 @@ type stickyDataType = {
     color: string;
     pinned: boolean;
     importance: (0 | 1 | 2 | 3 | 4 | 5);
+    sequence: number;
 };
 
 enum TodosActionsKind {

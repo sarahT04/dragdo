@@ -37,7 +37,8 @@ function todosReducer(todos: stickyDataType[], action: todoAction) {
     switch (type) {
 
         case TodosActionsKind.EDIT_TODO:
-            return editTodo(todos, payload);
+            // return editTodo(todos, payload);
+            break;
 
         case TodosActionsKind.DELETE_TODO:
             return deleteTodo(todos, payload);

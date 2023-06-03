@@ -1,9 +1,10 @@
-import { getServerSession } from "next-auth/next";
 import { Inter } from "next/font/google";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import Providers from "./Providers";
-import { signIn } from "next-auth/react";
 import './globals.css';
+import Success from "@components/buttons/Success";
+import { getServerSession } from "next-auth";
+import SignInButton from "@/components/SignInButton";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +18,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
+  console.log(session)
 
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
@@ -25,17 +27,17 @@ export default async function RootLayout({
         className={`
       ${inter.className}
       transition-all duration-150
-      bg-slate-300
-      text-slate-800
-      dark:text-slate-300
-      dark:bg-slate-800
+      dark-mode
       `}>
         <Providers>
           {session
             ? children
-            : <button onClick={() => signIn('google')}>
-              Sign up or login
-            </button>
+            :
+            <main
+              className="grid place-items-center h-screen w-screen"
+            >
+              <SignInButton />
+            </main>
           }
         </Providers>
       </body>

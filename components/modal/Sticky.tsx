@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, SetStateAction, useState, KeyboardEvent, useContext } from 'react'
+import { Fragment, useState, useContext } from 'react'
 import { PlayCircleIcon, MinusCircleIcon } from '@heroicons/react/24/solid';
 import Importance from '../rating/Importance';
 import ColorPickerModal from './ColorPicker';
@@ -7,13 +7,11 @@ import Alert from '../buttons/Alert';
 import Success from '../buttons/Success';
 import { useTheme } from 'next-themes';
 import { ModalContext } from '../context/modal';
+import { enterPressed } from '@/utils/utils';
 
 const DARK_COLOR = "#1e293b";
 const LIGHT_COLOR = "#cbd5e1";
 const shouldChangeColor = (color: string | null) => color !== null && (color !== DARK_COLOR && color !== LIGHT_COLOR);
-const enterPressed = (e: KeyboardEvent<SVGSVGElement>) => {
-    return (e.key === 'Enter');
-}
 
 type StickyModalProps = {}
 
@@ -88,14 +86,14 @@ export default function StickyModal() {
                                                 shouldChangeColor(color)
                                                     ? <MinusCircleIcon
                                                         tabIndex={0}
-                                                        onKeyDown={(e) => enterPressed(e) ? resetColor() : null}
+                                                        onKeyDown={(e: React.KeyboardEvent) => enterPressed(e) ? resetColor() : null}
                                                         className="w-6 h-6 text-red-200"
                                                         onClick={resetColor}
                                                         title="Reset color"
                                                     />
                                                     : null
                                             }
-                                            <PlayCircleIcon tabIndex={0} onKeyDown={(e) => enterPressed(e) ? openPicker() : null}
+                                            <PlayCircleIcon tabIndex={0} onKeyDown={(e: React.KeyboardEvent) => enterPressed(e) ? openPicker() : null}
                                                 className="w-6 h-6" onClick={openPicker} />
                                         </div>
                                         <ColorPickerModal color={color} open={pickerVisible} onClose={closePicker} setColor={setColor} />

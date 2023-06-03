@@ -2,6 +2,7 @@ import { Popover, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import ThemeSwitcher from "@components/ThemeSwitcher";
+import SignOutButton from './SignOutButton';
 
 const popoverLinks = [
     { id: 'popover1', label: 'To-dos', title: "See today's to-dos", href: "/" },
@@ -12,7 +13,7 @@ const popoverLinks = [
 export default function RoutePopovers() {
     return (
         <Popover className="p-2">
-            <Popover.Button className="inline-flex items-center">
+            <Popover.Button className="inline-flex items-center outline-none">
                 <span>Go to</span>
                 <ChevronDownIcon
                     className="h-5 w-5 ui-open:transform ui-open:rotate-180 ui-open:duration-200 ui-open:transition-transform transform transition-transform rotate-0 duration-200" />
@@ -26,7 +27,7 @@ export default function RoutePopovers() {
                 leaveTo="transform scale-95 opacity-0"
             >
                 <Popover.Panel
-                    className="absolute shadow-2xl z-10 p-2 inverse-dark-mode rounded-md flex flex-col space-y-2 [&>*]:py-1 [&>*]:px-2"
+                    className="absolute shadow-2xl border-[1px] dark:border-slate-800 border-slate-300 z-10 p-2 inverse-dark-mode rounded-md flex flex-col space-y-2 [&>*]:py-1 [&>*]:px-2"
                 >
                     {
                         popoverLinks.map((popover) => {
@@ -40,6 +41,10 @@ export default function RoutePopovers() {
                             )
                         })
                     }
+                    <hr 
+                    className="!mb-0 !pb-0"
+                    />
+                    <SignOutButton />
                     <ThemeSwitcher />
                 </Popover.Panel>
             </Transition>
