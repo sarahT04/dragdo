@@ -1,3 +1,4 @@
+type sortTypes = 'pinned' | 'sequence';
 
 export function formatDateTime(date: Date | undefined) {
     if (date === undefined) return undefined;
@@ -10,6 +11,18 @@ export function formatDateTime(date: Date | undefined) {
         hour12: false
     } as const;
     return new Intl.DateTimeFormat('en-GB', options).format(date);
+}
+
+export const handleSort = (todos: stickyDataType[], sortTypes: sortTypes[]) => {
+    let sortedItems: stickyDataType[] = [...todos!];
+    for (const sortType of sortTypes) {
+        if (sortType === 'pinned') {
+            sortedItems.sort((a, b) => (a.pinned && !b.pinned) ? -1 : 1);
+        } else if (sortType === 'sequence') {
+            sortedItems.sort((a, b) => a.sequence - b.sequence);
+        }
+    }
+    return sortedItems;
 }
 
 export const enterPressed = (e: React.KeyboardEvent) => e.type === 'Enter';

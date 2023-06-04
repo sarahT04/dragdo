@@ -2,8 +2,8 @@ type stickyDataType = {
     id: string;
     title?: string | null;
     body: string;
-    created: Date;
-    updated: Date;
+    created: string;
+    updated: string;
     color: string | null;
     pinned: boolean;
     importance: (0 | 1 | 2 | 3 | 4 | 5);

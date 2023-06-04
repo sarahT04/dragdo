@@ -1,9 +1,11 @@
-import React, { forwardRef, HTMLAttributes, useContext, useState } from 'react';
+import React, { forwardRef, HTMLAttributes, useState } from 'react';
 import Importance from '../rating/Importance';
 import ItemDropdown from '../dropdown/ItemDropdown';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/20/solid';
 import { Transition } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/solid';
+import { pin, unpin } from '@/utils/apiCalls';
+import toast from 'react-hot-toast';
 import { formatDateTime } from '@/utils/utils';
 
 export type ItemProps = HTMLAttributes<HTMLDivElement> & {
@@ -18,12 +20,26 @@ export type ItemProps = HTMLAttributes<HTMLDivElement> & {
 const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDragging, className, noMenu = false, item, ...props }, ref) => {
     const { title, body, created, updated, color, pinned: userPinned, importance } = item || {};
     const [pinned, setPinned] = useState(userPinned);
-    const formattedUpdate = formatDateTime(updated);
-    const formattedCreated = formatDateTime(created);
-    // TODO below
-    const userId = "";
-    const changePin = (userId: string, todoId: string) => null
-    const handlePin = () => { setPinned(!pinned); changePin(userId, id); };
+    const [updatedUpdated, setUpdatedUpdated] = useState(updated);
+
+    const handlePin = async () => {
+        let promise = pin(id);
+        if (!pinned) {
+            promise = unpin(id);
+        }
+        toast.promise(
+            promise,
+            {
+                loading: pinned ? 'Unpinning...' : 'Pinning...',
+                success: () => {
+                    setPinned(!pinned);
+                    setUpdatedUpdated(formatDateTime(new Date()));
+                    return pinned ? 'Sticky unpinned' : 'Sticky pinned'
+                },
+                error: "Error happened in firebase."
+            }
+        )
+    };
     return (
         <section className={`${withOpacity ? "opacity-50" : "opacity-100"} p-2
         h-72 w-full inverse-dark-mode rounded-md drop-shadow-xl group relative
@@ -64,7 +80,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                             <div className="group-hover:opacity-100 opacity-0 inline-flex transition-opacity">
                                 <LockOpenIcon className='w-6 h-6 mt-1' title="Pin this to-do" onClick={handlePin} />
                                 <ItemDropdown
-                                    created={formattedCreated!}
+                                    created={created!}
                                 />
                             </div>
                         </Transition>
@@ -84,7 +100,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                         </div>
                         <div className="mt-auto inline-flex w-full py-2 px-4 items-center justify-between self-end">
                             <Importance importance={importance!} />
-                            {formattedUpdate}
+                            {updatedUpdated}
                         </div>
                     </>
             }

@@ -5,18 +5,24 @@ import StickyModal from "@components/modal/Sticky";
 import Sticky from "@components/sticky/Container";
 import ModalProvider from "@components/context/modal";
 import StickyProvider from "@components/context/todos";
+import { Toaster } from "react-hot-toast";
 
 type HomeProps = {
-  initialData: stickyDataType[];
+  initialData: stickyDataType[] | null;
 }
 
 export default function Homepage({ initialData }: HomeProps) {
-  const [todos, setTodos] = useState<stickyDataType[]>(initialData) // useState(Array.from({ length: 4 }, (_, i) => (i + 1).toString()));
+  const [todos, setTodos] = useState<stickyDataType[] | null>(initialData) // useState(Array.from({ length: 4 }, (_, i) => (i + 1).toString()));
   const [activeData, setActiveData] = useState<stickyDataType | null>(null);
 
   return (
     <>
       <Navbar />
+      <Toaster
+        position="bottom-center"
+        reverseOrder={false}
+        containerClassName="mb-6"
+      />
       <ModalProvider>
         <StickyProvider>
           <main className="flex">
