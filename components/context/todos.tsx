@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useReducer, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useReducer, useState } from "react";
 import { allDatas } from "../sticky/datasType";
 import { ModalContext } from "./modal";
 
@@ -74,13 +74,11 @@ export default function StickyProvider({ children }: { children: ReactNode }) {
         }
     }
 
-
-
     return (
         <StickyContext.Provider value={{
-            todos, setTodos,
+            // todos, setTodos,
             activeData, setActiveData,
-            newTodo, editTodo, deleteTodo,
+            // newTodo, editTodo, deleteTodo,
         }}>
             {children}
         </StickyContext.Provider>

@@ -2,7 +2,6 @@ import { Inter } from "next/font/google";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import Providers from "./Providers";
 import './globals.css';
-import Success from "@components/buttons/Success";
 import { getServerSession } from "next-auth";
 import SignInButton from "@/components/SignInButton";
 
@@ -19,8 +18,6 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const session = await getServerSession(authOptions);
-  console.log(session)
-
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body

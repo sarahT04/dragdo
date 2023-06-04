@@ -1,3 +1,0 @@
-function editTodoDb(todo: stickyDataType) {
-    
-}

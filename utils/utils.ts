@@ -1,5 +1,6 @@
 
-export function formatDateTime(date: Date) {
+export function formatDateTime(date: Date | undefined) {
+    if (date === undefined) return undefined;
     const options = {
         day: '2-digit',
         month: '2-digit',

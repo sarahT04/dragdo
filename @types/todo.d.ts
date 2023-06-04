@@ -4,10 +4,12 @@ type stickyDataType = {
     body: string;
     created: Date;
     updated: Date;
-    color: string;
+    color: string | null;
     pinned: boolean;
     importance: (0 | 1 | 2 | 3 | 4 | 5);
     sequence: number;
+    done: boolean;
+    deadline: Date | 'never';
 };
 
 enum TodosActionsKind {
@@ -30,11 +32,11 @@ type todoAction = {
 }
 
 type stickyContextType = {
-    todos: stickyDataType[] | null;
-    setTodos: Dispatch<SetStateAction<stickyDataType[] | null>>;
+    // todos: stickyDataType[] | null;
+    // setTodos: Dispatch<SetStateAction<stickyDataType[] | null>>;
     activeData: stickyDataType | null;
     setActiveData: Dispatch<SetStateAction<stickyDataType | null>>;
-    newTodo: (oldTodos: stickyDataType[], todo: stickyDataType) => Promise<stickyDataType[]>;
-    editTodo: (todo: stickyDataType) => Promise<void | null>;
-    deleteTodo: (oldTodos: stickyDataType[], todo: stickyDataType) => Promise<stickyDataType[]>;
+    // newTodo: (oldTodos: stickyDataType[], todo: stickyDataType) => Promise<stickyDataType[]>;
+    // editTodo: (todo: stickyDataType) => Promise<void | null>;
+    // deleteTodo: (oldTodos: stickyDataType[], todo: stickyDataType) => Promise<stickyDataType[]>;
 }
