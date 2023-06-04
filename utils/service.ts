@@ -16,7 +16,7 @@ const sticky = db.collection('sticky');
 
 async function editPinned(id: string, pinned: boolean) {
     try {
-        const res = await sticky.doc(id).update({
+        await sticky.doc(id).update({
             pinned,
         });
         return true;

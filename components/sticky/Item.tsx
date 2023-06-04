@@ -88,7 +88,10 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
             }
             {
                 noMenu || item === undefined
-                    ? <div className="mx-auto text-center mt-auto">
+                    ? <div className="mx-auto text-center mt-auto"
+                    tabIndex={0}
+                    
+                    >
                         <PlusIcon className="w-2/3 h-2/3 mx-auto" />
                         <h3>Add new to-do</h3>
                     </div>

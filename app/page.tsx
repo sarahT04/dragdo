@@ -5,9 +5,8 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 export default async function IndexPage() {
     const session = await getServerSession(authOptions);
-    const { email } = session?.user || {};
-    const initialData = await getTodaySticky({ email: email ?? null });
+    const { email, name } = session?.user || {};
     return (
-        <Homepage initialData={initialData} />
+        <Homepage email={email} />
     )
 }

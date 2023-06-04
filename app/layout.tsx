@@ -29,8 +29,7 @@ export default async function RootLayout({
         <Providers>
           {session
             ? children
-            :
-            <main
+            : <main
               className="grid place-items-center h-screen w-screen"
             >
               <SignInButton />

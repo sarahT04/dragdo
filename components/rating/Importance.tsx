@@ -4,31 +4,33 @@ import { useState } from "react";
 
 type importanceProps = {
     importance: (0 | 1 | 2 | 3 | 4 | 5);
-}
+};
 
 export default function Importance({ importance }: importanceProps) {
     const [value, setValue] = useState<number>(importance);
     return (
-        <RadioGroup value={value} onChange={setValue} title="Set importance">
-            <RadioGroup.Label className="sr-only">
-                Choose importance from 1 to 5
-            </RadioGroup.Label>
-            <div className="flex flex-row">
-                {
-                    Array.from({ length: 5 }, (_, i) => (i + 1)).map((item) => (
-                        <RadioGroup.Option
-                            key={`option${item}`}
-                            value={item}
-                            className={`cursor-pointer 
-                            text-gray-200 hover:text-yellow-400
-                            peer peer-hover:text-yellow-400 
-                            ui-active:text-yellow-500 ui-checked:text-yellow-500 
-                            ${value >= item ? "text-yellow-500" : ""}`}
-                        >
-                            <RadioGroup.Label as={ExclamationCircleIcon} className="w-6 h-6" />
-                        </RadioGroup.Option>
-                    ))
-                }
+        <RadioGroup value={value} onChange={setValue} className="w-fit my-1">
+            <RadioGroup.Label className="sr-only">Choose importance from one to five</RadioGroup.Label>
+            <div className="flex flex-row-reverse gap-3">
+                {Array.from({ length: 5 }, (v, i) => i + 1).reverse().map((item) => (
+                    <RadioGroup.Option
+                        key={item}
+                        value={item}
+                        className={({ active, checked }) =>
+                            `
+                                cursor-pointer text-gray-200
+                                flex-1 hover:text-slate-400
+                                peer
+                                peer-hover:text-slate-400
+                                ${active ? 'text-yellow-500' : ''}
+                                ${checked ? 'text-yellow-500' : ''}
+                                ${value >= item ? 'text-yellow-500' : ''}
+                            `
+                        }
+                    >
+                        <RadioGroup.Label as={ExclamationCircleIcon} className="w-6 h-6" />
+                    </RadioGroup.Option>
+                ))}
             </div>
         </RadioGroup>
     )
