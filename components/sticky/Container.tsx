@@ -1,4 +1,4 @@
-import React, { useCallback, Dispatch, SetStateAction } from 'react';
+import React, { useCallback, Dispatch, SetStateAction, useState } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -14,8 +14,7 @@ import { MouseSensor, TouchSensor } from '../overrides';
 import Grid from './Grid';
 import SortableItem from './SortableItem';
 import Item from './Item';
-import useSWR from 'swr';
-import { fetchTodaySticky } from '@/utils/apiCalls';
+import { moveSticky } from '@/utils/apiCalls';
 import { toast } from 'react-hot-toast';
 import { allDatas } from './datasType';
 
@@ -42,12 +41,13 @@ function AddNewSticky({ loading = false }: { loading?: boolean }) {
 }
 
 export default function Container({ activeData, setActiveData, email }: StickyProps) {
-    const { data, mutate, isLoading, error } = useSWR(email, fetchTodaySticky);
-    const { data: todos, message }: { data: stickyDataType[], message: string; } = !isLoading && data;
+    // const { data, mutate, isLoading, error } = useSWR(email, fetchTodaySticky);
+    const [todos, setTodos] = useState(allDatas);
+    const [isLoading, error] = [false, false];
+    // const { data: todos, message }: { data: stickyDataType[], message: string; } = !isLoading && data;
     if (error) {
         toast.error("Error happened when retreiving your sticky. Sorry");
     };
-    console.log(todos);
     const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -57,19 +57,32 @@ export default function Container({ activeData, setActiveData, email }: StickyPr
 
     const handleDragEnd = useCallback(async (event: DragEndEvent) => {
         const { active, over } = event;
+        const todosCopy = [...todos!]
 
         if (active.id !== over?.id) {
-            const oldIndex = todos!.findIndex((item) => item.id === active.id)
-            const newIndex = todos!.findIndex((item) => item.id === over?.id);
+            const oldIndex = todosCopy.findIndex((item) => item.id === active.id);
+            const newIndex = todosCopy.findIndex((item) => item.id === over?.id);
 
-            const newArray = arrayMove(todos!, oldIndex, newIndex);
-            await 
-            mutate(newArray);
+            const oldTodo = todosCopy[oldIndex];
+            const oldTodoSequence = oldTodo.sequence;
+            const newTodo = todosCopy[newIndex];
+            const from = { id: oldTodo.id, sequence: oldTodo.sequence };
+            const to = { id: newTodo.id, sequence: newTodo.sequence };
+            oldTodo.sequence = newTodo.sequence;
+            newTodo.sequence = oldTodoSequence;
+            const res = await moveSticky(from, to);
+            const newArray = arrayMove(todosCopy, oldIndex, newIndex);
+            // Fix mutate below :3
+            // mutate([email, newArray]);
+            if (res === true) {
+                console.log(res);
+
+            }
         }
 
         setActiveData(null);
         // Make API call to save data here
-    }, [setActiveData, mutate, todos]);
+    }, [setActiveData, todos]);
 
     const handleDragCancel = useCallback(() => {
         setActiveData(null);
@@ -79,7 +92,7 @@ export default function Container({ activeData, setActiveData, email }: StickyPr
         <>
             {
                 isLoading || error ? <AddNewSticky loading={true} />
-                    : todos === null
+                    : todos === null || todos === undefined
                         ?
                         <AddNewSticky />
                         :

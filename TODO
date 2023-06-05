@@ -1,5 +1,9 @@
 change getTodaySticky if needed.
 fix importance :3
+fix mutate :3
+
+current problem: if use useSWRSubscription,
+our firebase uses backend but useswr uses client.
 
 SIDEBAR
 1. Create a TDL from importance / per day

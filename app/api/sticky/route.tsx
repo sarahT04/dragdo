@@ -1,7 +1,6 @@
 import { getTodaySticky } from "@/utils/service";
 import { NextResponse } from "next/server";
 
-
 export async function POST(request: Request) {
     const { email }: { email: string } = await request.json()
     try {

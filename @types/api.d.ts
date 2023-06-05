@@ -5,5 +5,5 @@ type PinnedExpectedResult = {
 
 type moveStickyProps = {
     id: string;
-    sequnce: number;
+    sequence: number;
 }
