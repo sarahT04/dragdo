@@ -19,7 +19,7 @@ export const handleSort = (todos: stickyDataType[], sortTypes: sortTypes[]) => {
         if (sortType === 'pinned') {
             sortedItems.sort((a, b) => (a.pinned && !b.pinned) ? -1 : 1);
         } else if (sortType === 'sequence') {
-            sortedItems.sort((a, b) => a.sequence - b.sequence);
+            sortedItems.sort((a, b) => b.sequence - a.sequence);
         }
     }
     return sortedItems;

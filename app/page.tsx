@@ -1,16 +1,13 @@
-"use client"
 import Homepage from "./Homepage"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import useSWRSubscription from 'swr/subscription'
-import { subscribeTodaySticky } from '@/utils/service';
+import { getTodaySticky } from "@/utils/service";
 
 export default async function IndexPage() {
     const session = await getServerSession(authOptions);
-    const { email, name } = session?.user || {};
-    const { data } = useSWRSubscription(['sticky', email], subscribeTodaySticky);
-    console.log(data);
+    const { email } = session!.user!;
+    const initialData = await getTodaySticky({ email: email! });
     return (
-        <Homepage email={email} />
+        <Homepage initialData={initialData} />
     )
 }

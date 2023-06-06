@@ -1,7 +1,7 @@
 // import * as admin from 'firebase-admin';
 import { formatDateTime, handleSort } from './utils';
-import firebase from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { collection, doc, getDocs, getFirestore, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,14 +12,12 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     // measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
-
-// TODO
-
 // Initialize Firebase
-let firebase_app = firebase.getApps().length === 0 ? firebase.initializeApp(firebaseConfig) : firebase.getApps()[0]
-const db = getFirestore(firebase_app);
+const app = initializeApp(firebaseConfig);
 
-
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
+const sticky = collection(db, "sticky")
 
 // if (!admin.apps.length) {
 //     admin.initializeApp({
@@ -36,12 +34,12 @@ const db = getFirestore(firebase_app);
 
 async function editStickySequence(from: moveStickyProps, to: moveStickyProps) {
     try {
-        await sticky.doc(from.id).update({
+        await updateDoc(doc(db, "sticky", from.id), {
             sequence: to.sequence,
         });
-        await sticky.doc(to.id).update({
+        await updateDoc(doc(db, "sticky", to.id), {
             sequence: from.sequence,
-        })
+        });
         return true;
     } catch (e) {
         console.log(e)
@@ -51,9 +49,9 @@ async function editStickySequence(from: moveStickyProps, to: moveStickyProps) {
 
 async function editPinned(id: string, pinned: boolean) {
     try {
-        await sticky.doc(id).update({
+        await updateDoc(doc(db, "sticky", id), {
             pinned,
-        });
+        })
         return true;
     } catch (e) {
         return false;
@@ -66,25 +64,27 @@ function editTodoDb(todo: stickyDataType) {
     );
 }
 
-async function subscribeTodaySticky([_, email], { next }) {
-    const q = sticky.where('email', '==', email);
-    const unsub = q.onSnapshot(
-        query => {
+function subscribeTodaySticky([_, email], { next }) {
+    const q = query(collection(db, "sticky"), where("email", "==", email))
+    const unsub = onSnapshot(
+        q,
+        (querySnapshot) => {
             const formattedResult: stickyDataType[] = [];
-            query.forEach((doc) => {
-                const data = doc.data()
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
                 const formattedData = {
                     id: doc.id,
                     ...doc.data(),
-                    created: formatDateTime(doc.createTime.toDate()),
-                    updated: formatDateTime(doc.updateTime.toDate()),
+                    created: formatDateTime(new Date(data.created.seconds * 1000)),
+                    updated: formatDateTime(new Date(data.updated.seconds * 1000)),
                 } as stickyDataType;
                 formattedResult.push(formattedData);
             })
-            return next(null, formattedResult);
+            const sortedTodos = handleSort(formattedResult, ['sequence', 'pinned']);
+            return next(null, sortedTodos);
         },
-        err => next(err)
-    )
+        (err) => next(err))
+    console.log('end')
     return unsub;
 }
 
@@ -92,16 +92,18 @@ async function getTodaySticky({ email }: { email: string | null }) {
     if (email === null) return null;
     try {
         const formattedResult: stickyDataType[] = [];
-        const result = await sticky.where('email', '==', email).get();
+        const q = query(collection(db, "sticky"), where("email", "==", email))
+        const result = await getDocs(q);
         // if result is empty return null
         if (result.empty) throw Error;
         // we format the result
         result.forEach((doc) => {
+            const data = doc.data();
             const formattedData = {
-                id: doc.id,
+                id: data.id,
                 ...doc.data(),
-                created: formatDateTime(doc.createTime.toDate()),
-                updated: formatDateTime(doc.updateTime.toDate()),
+                created: formatDateTime(new Date(data.created.seconds * 1000)),
+                updated: formatDateTime(new Date(data.updated.seconds * 1000)),
             } as stickyDataType;
             formattedResult.push(formattedData);
         })

@@ -7,10 +7,10 @@ import ModalProvider from "@components/context/modal";
 import { Toaster } from "react-hot-toast";
 
 type HomeProps = {
-  email: string;
+  initialData: stickyDataType[] | null;
 }
 
-export default function Homepage({ email }: HomeProps) {
+export default function Homepage({ initialData }: HomeProps) {
   const [activeData, setActiveData] = useState<stickyDataType | null>(null);
 
   return (
@@ -22,13 +22,13 @@ export default function Homepage({ email }: HomeProps) {
         containerClassName="mb-6"
       />
       <ModalProvider>
-          <main className="flex">
-            <Sticky
-              email={email}
-              activeData={activeData} setActiveData={setActiveData}
-            />
-            <StickyModal />
-          </main>
+        <main className="flex">
+          <Sticky
+            initialData={initialData}
+            activeData={activeData} setActiveData={setActiveData}
+          />
+          <StickyModal />
+        </main>
       </ModalProvider>
     </>
   )

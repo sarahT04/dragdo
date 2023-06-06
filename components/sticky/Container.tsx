@@ -17,11 +17,13 @@ import Item from './Item';
 import { moveSticky } from '@/utils/apiCalls';
 import { toast } from 'react-hot-toast';
 import { allDatas } from './datasType';
+import useSWRSubscription from 'swr/subscription'
+import { subscribeTodaySticky } from '@/utils/service';
 
 type StickyProps = {
     activeData: stickyDataType | null;
     setActiveData: Dispatch<SetStateAction<stickyDataType | null>>;
-    email: string;
+    initialData: stickyDataType[] | null;
 }
 
 function AddNewSticky({ loading = false }: { loading?: boolean }) {
@@ -40,10 +42,15 @@ function AddNewSticky({ loading = false }: { loading?: boolean }) {
     );
 }
 
-export default function Container({ activeData, setActiveData, email }: StickyProps) {
+
+export default function Container({ activeData, setActiveData, initialData }: StickyProps) {
+    const [todos, setTodos] = useState(initialData);
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
     // const { data, mutate, isLoading, error } = useSWR(email, fetchTodaySticky);
-    const [todos, setTodos] = useState(allDatas);
-    const [isLoading, error] = [false, false];
+    // const { data: todos } = useSWRSubscription(['sticky', email], subscribeTodaySticky);
+    // const [isLoading, error] = [false, false];
+    // console.log(todos);
     // const { data: todos, message }: { data: stickyDataType[], message: string; } = !isLoading && data;
     if (error) {
         toast.error("Error happened when retreiving your sticky. Sorry");
@@ -71,7 +78,7 @@ export default function Container({ activeData, setActiveData, email }: StickyPr
             oldTodo.sequence = newTodo.sequence;
             newTodo.sequence = oldTodoSequence;
             const res = await moveSticky(from, to);
-            const newArray = arrayMove(todosCopy, oldIndex, newIndex);
+            // const newArray = arrayMove(todos, oldIndex, newIndex);
             // Fix mutate below :3
             // mutate([email, newArray]);
             if (res === true) {
@@ -91,8 +98,8 @@ export default function Container({ activeData, setActiveData, email }: StickyPr
     return (
         <>
             {
-                isLoading || error ? <AddNewSticky loading={true} />
-                    : todos === null || todos === undefined
+                loading || error ? <AddNewSticky loading={true} />
+                    : todos === null
                         ?
                         <AddNewSticky />
                         :
