@@ -2,7 +2,11 @@ change getTodaySticky if needed.
 fix importance :3
 fix mutate :3
 
-create a function on container where when you press edit, you're going to open modal and set modal data to be current data.
+refactor API cuz there are some errors
+regarding type (check AddDataType)
+and also serverTimeStamp()
+ALSO U FORGOT TO APPEND THE EMAIL LOL
+
 
 SIDEBAR
 1. Create a TDL from importance / per day

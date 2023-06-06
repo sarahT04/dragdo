@@ -1,6 +1,6 @@
 type stickyDataType = {
     id: string;
-    title?: string | null;
+    title: string | null;
     body: string;
     created: string;
     updated: string;
@@ -13,13 +13,34 @@ type stickyDataType = {
 };
 
 type ModalDataType = {
-    pTitle: string | null;
-    pBody: string | null;
-    pImportance: (0 | 1 | 2 | 3 | 4 | 5);
-    pColor: string | null;
-    pPinned: boolean;
-    pDeadline: Date | 'never',
+    type: "edit" | "add",
+    data: {
+        pId: string | null;
+        pTitle: string | null;
+        pBody: string | null;
+        pImportance: (0 | 1 | 2 | 3 | 4 | 5);
+        pColor: string | null;
+        pPinned: boolean;
+        pDeadline: Date | 'never',
+    }
 };
+
+type AddDataType = {
+    id: string | null;
+    title: string | null;
+    body: string;
+    color: string | null;
+    pinned: boolean;
+    importance: (0 | 1 | 2 | 3 | 4 | 5);
+    sequence: number;
+    done: boolean;
+    deadline: Date | 'never';
+}
+
+type StickyProps = {
+    todos: stickyDataType[] | null;
+    setTodos: Dispatch<SetStateAction<stickyDataType[] | null>>;
+}
 
 enum TodosActionsKind {
     ACTIVE_DATA = 'ACTIVE_DATA',

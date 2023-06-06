@@ -4,11 +4,9 @@ import ItemDropdown from '../dropdown/ItemDropdown';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/20/solid';
 import { Transition } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import toast from 'react-hot-toast';
-import { formatDateTime } from '@/utils/utils';
 import { unpin, pin } from '@/utils/service';
 import { ModalContext } from '../context/modal';
-import { StickyContext } from '../context/todos';
+import { enterPressed, returnNullIfNotString } from '@/utils/utils';
 
 export type ItemProps = HTMLAttributes<HTMLDivElement> & {
     id: string;
@@ -20,8 +18,7 @@ export type ItemProps = HTMLAttributes<HTMLDivElement> & {
 
 // eslint-disable-next-line react/display-name
 const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDragging, className, noMenu = false, item, ...props }, ref) => {
-    const { openModal } = useContext(ModalContext)!;
-    const { setModalData } = useContext(StickyContext)!;
+    const { openModal, setModalData } = useContext(ModalContext)!;
     const { title, body, created, updated, color, pinned: userPinned, importance } = item || {};
     const [pinned, setPinned] = useState(userPinned);
     const [updatedUpdated, setUpdatedUpdated] = useState(updated);
@@ -42,8 +39,34 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
     };
 
     const onEdit = () => {
-        const todo = {
-            pTitle: title, pBody: body, pImportance: importance, pColor: color, pPinned: pinned, pDeadline: 'never',
+        const todo: ModalDataType = {
+            type: "edit",
+            data: {
+                pId: id,
+                pTitle: returnNullIfNotString(title),
+                pBody: returnNullIfNotString(body),
+                pImportance: typeof importance !== 'number' ? 0 : importance,
+                pColor: returnNullIfNotString(color),
+                pPinned: typeof pinned !== 'boolean' ? false : pinned,
+                pDeadline: 'never' as "never",
+            }
+        }
+        setModalData(todo);
+        openModal();
+    };
+
+    const onAdd = () => {
+        const todo: ModalDataType = {
+            type: "add",
+            data: {
+                pId: null,
+                pTitle: null,
+                pBody: null,
+                pImportance: 0,
+                pColor: null,
+                pPinned: false,
+                pDeadline: 'never' as "never",
+            }
         }
         setModalData(todo);
         openModal();
@@ -101,7 +124,8 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                 noMenu || item === undefined
                     ? <div className="mx-auto text-center mt-auto"
                         tabIndex={0}
-
+                        onClick={onAdd}
+                        onKeyDown={(e) => enterPressed(e) ? onAdd : undefined}
                     >
                         <PlusIcon className="w-2/3 h-2/3 mx-auto" />
                         <h3>Add new to-do</h3>

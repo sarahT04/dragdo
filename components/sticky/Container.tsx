@@ -22,11 +22,6 @@ type FromToType = {
     id: string;
 }
 
-type StickyProps = {
-    todos: stickyDataType[] | null;
-    setTodos: Dispatch<SetStateAction<stickyDataType[] | null>>;
-}
-
 function AddNewSticky({ loading = false }: { loading?: boolean }) {
     return (
         <Grid>

@@ -1,7 +1,7 @@
 // import * as admin from 'firebase-admin';
 import { formatDateTime, handleSort } from './utils';
 import { initializeApp } from "firebase/app";
-import { collection, doc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, getFirestore, query, setDoc, updateDoc, where, serverTimestamp, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -53,10 +53,26 @@ function pin(id: string) {
     return editPinned(id, true);
 }
 
-async function setTodoDb(todo: stickyDataType) {
+async function createTodoDb(todo: AddDataType) {
     try {
-        await setDoc(doc(db, "sticky", todo.id), {
+        // const timestamp = new Date()
+        const res = await addDoc(collection(db, "sticky"), {
             ...todo,
+            created: serverTimestamp(),
+            updated: serverTimestamp(),
+        })
+        return { ...todo, id: res.id }; // created: timestamp, updated: timestamp 
+    } catch (e) {
+        console.log(e)
+        return false;
+    };
+}
+
+async function setTodoDb(todo: AddDataType) {
+    try {
+        await setDoc(doc(db, "sticky", todo.id!), {
+            ...todo,
+            updated: serverTimestamp(),
         })
         return true;
     } catch (e) {
@@ -100,4 +116,5 @@ export {
     unpin,
     pin,
     editStickySequence,
+    createTodoDb
 };

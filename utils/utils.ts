@@ -26,3 +26,6 @@ export const handleSort = (todos: stickyDataType[], sortTypes: sortTypes[]) => {
 }
 
 export const enterPressed = (e: React.KeyboardEvent) => e.type === 'Enter';
+
+export const returnNullIfNotString = (str: string | undefined | null) => typeof str !== "string" ? null : str;
+ 

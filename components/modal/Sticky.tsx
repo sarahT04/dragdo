@@ -7,22 +7,24 @@ import Alert from '../buttons/Alert';
 import Success from '../buttons/Success';
 import { useTheme } from 'next-themes';
 import { ModalContext } from '../context/modal';
-import { enterPressed } from '@/utils/utils';
-import { StickyContext } from '../context/todos';
+import { enterPressed, returnNullIfNotString } from '@/utils/utils';
+import { toast } from 'react-hot-toast';
+import { createTodoDb, setTodoDb } from '@/utils/service';
 
 const DARK_COLOR = "#1e293b";
 const LIGHT_COLOR = "#cbd5e1";
 const shouldChangeColor = (color: string | null | undefined) => typeof color === 'string' && (color !== DARK_COLOR && color !== LIGHT_COLOR);
 const makeSureItsString = (str: string | null | undefined) => typeof str !== 'string' ? "" : str;
 
-type StickyModalProps = {}
-
-export default function StickyModal() {
-    const { modalOpen, closeModal } = useContext(ModalContext)!;
-    const { modalData } = useContext(StickyContext)!;
-    const { pTitle, pBody, pImportance, pColor, pPinned, pDeadline } = modalData || {};
+export default function StickyModal({ todos, setTodos }: StickyProps) {
+    const { modalOpen, closeModal, modalData } = useContext(ModalContext)!;
+    const { data, type } = modalData || {};
+    const isEdit = type === 'edit';
+    const { pId, pTitle, pBody, pImportance, pColor, pPinned, pDeadline } = data || {};
     const { theme } = useTheme();
+    // Utility state
     const [pickerVisible, setPickerVisible] = useState(false);
+    const [error, setError] = useState({ error: false, message: '' });
     // Form states
     const [title, setTitle] = useState(pTitle);
     const [body, setBody] = useState(pBody);
@@ -45,14 +47,55 @@ export default function StickyModal() {
 
     useMemo(() => {
         // reinitialize due to modalData not being changed during first initialization. 
-        const { pTitle, pBody, pImportance, pColor, pPinned, pDeadline } = modalData || {};
+        const { pTitle, pBody, pImportance, pColor, pPinned, pDeadline } = data || {};
         setTitle(pTitle);
         setBody(pBody);
         setImportance(pImportance);
         setColor(pColor);
         setPinned(pPinned);
         setDeadline(pDeadline);
-    }, [modalData])
+    }, [data])
+
+    const handleSuccess = () => {
+        if (typeof body !== "string" || body!.length < 1) {
+            setError({ error: true, message: "Sticky content can't be empty." })
+            return;
+        }
+        const todo: AddDataType = {
+            id: returnNullIfNotString(pId),
+            title: returnNullIfNotString(title),
+            body: body,
+            color: returnNullIfNotString(color),
+            pinned: pinned === undefined ? false : pinned,
+            importance: importance === undefined ? 0 : importance,
+            sequence: (todos === null ? 1 : todos.length + 1),
+            done: false,
+            deadline: "never",
+            // Add created here
+        };
+
+        let handlerFunction = createTodoDb(todo);
+        if (isEdit) {
+            handlerFunction = setTodoDb(todo);
+        }
+        toast.promise(
+            handlerFunction,
+            {
+                loading: `${isEdit ? "Editing" : "Adding"} your to-do...`,
+                success: (data) => {
+                    console.log(data);
+                    if (todos === null) {
+                        setTodos([data]);
+                    } else {
+                        setTodos([...todos, data])
+                    }
+                    closeModal()
+                    return `${isEdit ? "Edited" : "Added"} your to-do!`
+                },
+                error: `Can't ${isEdit ? "edit" : "add"} your to-do. Try again in few mins...`
+            }
+        )
+    }
 
     return (
         <>
@@ -93,7 +136,12 @@ export default function StickyModal() {
                                         as="h3"
                                         className="text-lg font-medium leading-6"
                                     >
-                                        Add new to-do
+                                        {
+                                            isEdit
+                                                ? "Edit current "
+                                                : "Add new "
+                                        }
+                                        to-do
                                     </Dialog.Title>
                                     <input
                                         className="mt-2 w-full p-2 border-2 rounded-md my-1 inverse-dark-mode placeholder:inverse-dark-mode"
@@ -138,7 +186,9 @@ export default function StickyModal() {
                                     <div className="mt-6 flex justify-between">
                                         <Alert onClick={closeModal} label="Cancel" title="Discard to-do" />
                                         {/* TBD */}
-                                        <Success onClick={closeModal} label="Add" title="Add to-do" />
+                                        <Success onClick={handleSuccess}
+                                            label={`${isEdit ? "Edit" : "Add"}`}
+                                            title={`${isEdit ? "Edit" : "Add"} to-do`} />
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>
