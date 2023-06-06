@@ -1,4 +1,4 @@
-import React, { useCallback, Dispatch, SetStateAction, useState } from 'react';
+import React, { useCallback, Dispatch, SetStateAction, useState, useEffect } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -19,6 +19,11 @@ import { toast } from 'react-hot-toast';
 import { allDatas } from './datasType';
 import useSWRSubscription from 'swr/subscription'
 import { subscribeTodaySticky } from '@/utils/service';
+
+type FromToType = {
+    sequence: number;
+    id: string;
+}
 
 type StickyProps = {
     activeData: stickyDataType | null;
@@ -46,12 +51,7 @@ function AddNewSticky({ loading = false }: { loading?: boolean }) {
 export default function Container({ activeData, setActiveData, initialData }: StickyProps) {
     const [todos, setTodos] = useState(initialData);
     const [error, setError] = useState(false);
-    const [loading, setLoading] = useState(false);
-    // const { data, mutate, isLoading, error } = useSWR(email, fetchTodaySticky);
-    // const { data: todos } = useSWRSubscription(['sticky', email], subscribeTodaySticky);
-    // const [isLoading, error] = [false, false];
-    // console.log(todos);
-    // const { data: todos, message }: { data: stickyDataType[], message: string; } = !isLoading && data;
+
     if (error) {
         toast.error("Error happened when retreiving your sticky. Sorry");
     };
@@ -62,7 +62,14 @@ export default function Container({ activeData, setActiveData, initialData }: St
         setActiveData(currentActiveData ? currentActiveData : null);
     }, [todos, setActiveData]);
 
-    const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const moveStickyData = useCallback(async (from: FromToType, to: FromToType) => {
+        const res = await moveSticky(from, to);
+        if (!res.success) {
+            setError(true)
+        };
+    }, []);
+
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
         const { active, over } = event;
         const todosCopy = [...todos!]
 
@@ -77,19 +84,13 @@ export default function Container({ activeData, setActiveData, initialData }: St
             const to = { id: newTodo.id, sequence: newTodo.sequence };
             oldTodo.sequence = newTodo.sequence;
             newTodo.sequence = oldTodoSequence;
-            const res = await moveSticky(from, to);
-            // const newArray = arrayMove(todos, oldIndex, newIndex);
-            // Fix mutate below :3
-            // mutate([email, newArray]);
-            if (res === true) {
-                console.log(res);
-
-            }
+            const newArray = arrayMove(todosCopy, oldIndex, newIndex);
+            moveStickyData(from, to);
+            setTodos(newArray);
         }
-
         setActiveData(null);
         // Make API call to save data here
-    }, [setActiveData, todos]);
+    }, [todos, setActiveData, moveStickyData]);
 
     const handleDragCancel = useCallback(() => {
         setActiveData(null);
@@ -98,39 +99,38 @@ export default function Container({ activeData, setActiveData, initialData }: St
     return (
         <>
             {
-                loading || error ? <AddNewSticky loading={true} />
-                    : todos === null
-                        ?
-                        <AddNewSticky />
-                        :
-                        <DndContext
-                            sensors={sensors}
-                            collisionDetection={closestCenter}
-                            onDragStart={handleDragStart}
-                            onDragEnd={handleDragEnd}
-                            onDragCancel={handleDragCancel}
-                        >
-                            <SortableContext items={todos} strategy={rectSortingStrategy} >
-                                <Grid>
-                                    {
-                                        todos.map((item) => {
-                                            const { pinned } = item;
-                                            if (pinned) {
-                                                return (
-                                                    <Item key={item.id} id={item.id} item={item} />
-                                                )
-                                            }
+                todos === null
+                    ?
+                    <AddNewSticky />
+                    :
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                        onDragCancel={handleDragCancel}
+                    >
+                        <SortableContext items={todos} strategy={rectSortingStrategy} >
+                            <Grid>
+                                {
+                                    todos.map((item) => {
+                                        const { pinned } = item;
+                                        if (pinned) {
                                             return (
-                                                <SortableItem key={item.id} id={item.id} item={item} />
+                                                <Item key={item.id} id={item.id} item={item} />
                                             )
-                                        })}
-                                    <Item noMenu id="create new" title="Add new to-do" />
-                                </Grid>
-                            </SortableContext>
-                            <DragOverlay adjustScale style={{ transformOrigin: '0 0 ' }}>
-                                {activeData ? <Item id={activeData.id} isDragging item={activeData} /> : null}
-                            </DragOverlay>
-                        </DndContext>
+                                        }
+                                        return (
+                                            <SortableItem key={item.id} id={item.id} item={item} />
+                                        )
+                                    })}
+                                <Item noMenu id="create new" title="Add new to-do" />
+                            </Grid>
+                        </SortableContext>
+                        <DragOverlay adjustScale style={{ transformOrigin: '0 0 ' }}>
+                            {activeData ? <Item id={activeData.id} isDragging item={activeData} /> : null}
+                        </DragOverlay>
+                    </DndContext>
 
             }
         </>

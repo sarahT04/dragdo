@@ -12,6 +12,15 @@ type stickyDataType = {
     deadline: Date | 'never';
 };
 
+type ModalDataType = {
+    pTitle: string | null;
+    pBody: string | null;
+    pImportance: (0 | 1 | 2 | 3 | 4 | 5);
+    pColor: string | null;
+    pPinned: boolean;
+    pDeadline: Date | 'never',
+};
+
 enum TodosActionsKind {
     ACTIVE_DATA = 'ACTIVE_DATA',
     COLOR = 'COLOR',
@@ -34,8 +43,8 @@ type todoAction = {
 type stickyContextType = {
     // todos: stickyDataType[] | null;
     // setTodos: Dispatch<SetStateAction<stickyDataType[] | null>>;
-    activeData: stickyDataType | null;
-    setActiveData: Dispatch<SetStateAction<stickyDataType | null>>;
+    modalData: ModalDataType | null;
+    setModalData: Dispatch<SetStateAction<ModalDataType | null>>;
     // newTodo: (oldTodos: stickyDataType[], todo: stickyDataType) => Promise<stickyDataType[]>;
     // editTodo: (todo: stickyDataType) => Promise<void | null>;
     // deleteTodo: (oldTodos: stickyDataType[], todo: stickyDataType) => Promise<stickyDataType[]>;

@@ -2,8 +2,7 @@ change getTodaySticky if needed.
 fix importance :3
 fix mutate :3
 
-current problem: if use useSWRSubscription,
-our firebase uses backend but useswr uses client.
+create a function on container where when you press edit, you're going to open modal and set modal data to be current data.
 
 SIDEBAR
 1. Create a TDL from importance / per day

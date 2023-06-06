@@ -8,22 +8,30 @@ import Success from '../buttons/Success';
 import { useTheme } from 'next-themes';
 import { ModalContext } from '../context/modal';
 import { enterPressed } from '@/utils/utils';
+import { StickyContext } from '../context/todos';
 
 const DARK_COLOR = "#1e293b";
 const LIGHT_COLOR = "#cbd5e1";
 const shouldChangeColor = (color: string | null) => color !== null && (color !== DARK_COLOR && color !== LIGHT_COLOR);
 
-type StickyModalProps = {}
+type StickyModalProps = {
+    data?: dataProps
+}
 
-export default function StickyModal() {
-    const { theme } = useTheme();
+export default function StickyModal({ data }: StickyModalProps) {
     const { modalOpen, closeModal } = useContext(ModalContext)!;
+    const { modalData } = useContext(StickyContext!);
+    const { pTitle, pBody, pImportance, pColor, pPinned, pDeadline } = data || {};
+    const { theme } = useTheme();
     const [pickerVisible, setPickerVisible] = useState(false);
     // Form states
-    const [title, setTitle] = useState('');
-    const [body, setBody] = useState('')
-    const [importance, setimportance] = useState(0);
-    const [color, setColor] = useState<string | null>(null);
+    const [title, setTitle] = useState(pTitle);
+    const [body, setBody] = useState(pBody);
+    const [importance, setimportance] = useState(pImportance ?? 0);
+    const [color, setColor] = useState(pColor ?? null);
+    const [pinned, setPinned] = useState(pPinned ?? false);
+    const [deadline, setDeadline] = useState(pDeadline);
+
     // Utilities below
     const openPicker = () => {
         if (theme === 'dark') {

@@ -2,6 +2,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { useContext } from 'react';
 import { ModalContext } from '../context/modal';
+import { StickyContext } from '../context/todos';
 
 type ItemDropdownProps = {
     created: string;
@@ -23,6 +24,7 @@ function DropdownItem({ children, title, onClick }: DropdownItemProps) {
 
 function ItemDropdown({ created }: ItemDropdownProps) {
     const { openModal } = useContext(ModalContext)!;
+    const { setModalData } = useContext(StickyContext!);
     return (
         <div className="block relative">
             <Menu>

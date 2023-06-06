@@ -58,10 +58,16 @@ async function editPinned(id: string, pinned: boolean) {
     }
 }
 
-function editTodoDb(todo: stickyDataType) {
-    return (
-        null
-    );
+async function setTodoDb(todo: stickyDataType) {
+    try {
+        await setDoc(doc(db, "sticky", todo.id), {
+            ...todo,
+        })
+        return true;
+    } catch (e) {
+        console.log(e)
+        return false;
+    };
 }
 
 function subscribeTodaySticky([_, email], { next }) {
@@ -84,7 +90,6 @@ function subscribeTodaySticky([_, email], { next }) {
             return next(null, sortedTodos);
         },
         (err) => next(err))
-    console.log('end')
     return unsub;
 }
 
@@ -100,7 +105,7 @@ async function getTodaySticky({ email }: { email: string | null }) {
         result.forEach((doc) => {
             const data = doc.data();
             const formattedData = {
-                id: data.id,
+                id: doc.id,
                 ...doc.data(),
                 created: formatDateTime(new Date(data.created.seconds * 1000)),
                 updated: formatDateTime(new Date(data.updated.seconds * 1000)),

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useEffect, useReducer, useState } from "react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { allDatas } from "../sticky/datasType";
 import { ModalContext } from "./modal";
 
@@ -59,25 +59,22 @@ export default function StickyProvider({ children }: { children: ReactNode }) {
     // All todos
     const [todos, setTodos] = useState<stickyDataType[]>(allDatas);
     // For editing / creating new purpose and also for dragging purpose
-    const [activeData, setActiveData] = useState<stickyDataType | null>(null);
+    const [modalData, setModalData] = useState<ModalDataType | null>(null);
     // Modal for edit / create form
-    const editTodo = async (todo: stickyDataType) => {
-        try {
-            const result = await editTodoDb(todo);
-            if (result !== null) {
-                closeModal();
-                return setTodos([...todos, todo]);
-            }
-            return null;
-        } catch (e) {
-            return null;
+    const editTodoCallback = useCallback(async () => {
+        const result = await editTodoDb(modalData);
+        if (result !== null) {
+            // closeModal();
+            // return setTodos([...todos, todo]);
         }
-    }
+        return null;
+    }, [modalData]);
 
     return (
         <StickyContext.Provider value={{
             // todos, setTodos,
-            activeData, setActiveData,
+            modalData, setModalData,
+            editTodo,
             // newTodo, editTodo, deleteTodo,
         }}>
             {children}

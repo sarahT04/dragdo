@@ -1,4 +1,4 @@
-import React, { forwardRef, HTMLAttributes, useState } from 'react';
+import React, { forwardRef, HTMLAttributes, useCallback, useState } from 'react';
 import Importance from '../rating/Importance';
 import ItemDropdown from '../dropdown/ItemDropdown';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/20/solid';
@@ -22,24 +22,23 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
     const [pinned, setPinned] = useState(userPinned);
     const [updatedUpdated, setUpdatedUpdated] = useState(updated);
 
-    const handlePin = async () => {
-        let promise = pin(id);
+    const handlePinApi = useCallback(async (id: string) => {
         if (!pinned) {
-            promise = unpin(id);
+            return await unpin(id);
         }
-        toast.promise(
-            promise,
-            {
-                loading: pinned ? 'Unpinning...' : 'Pinning...',
-                success: () => {
-                    setPinned(!pinned);
-                    setUpdatedUpdated(formatDateTime(new Date()));
-                    return pinned ? 'Sticky unpinned' : 'Sticky pinned'
-                },
-                error: "Error happened in firebase."
-            }
-        )
+        return await pin(id);
+    }, [pinned]);
+
+    const handlePin = () => {
+        if (!pinned) {
+            setPinned(false);
+        }
+        setPinned(true);
+        handlePinApi(id);
     };
+
+    const handleEditApi = useCallback
+
     return (
         <section className={`${withOpacity ? "opacity-50" : "opacity-100"} p-2
         h-72 w-full inverse-dark-mode rounded-md drop-shadow-xl group relative
@@ -89,8 +88,8 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
             {
                 noMenu || item === undefined
                     ? <div className="mx-auto text-center mt-auto"
-                    tabIndex={0}
-                    
+                        tabIndex={0}
+
                     >
                         <PlusIcon className="w-2/3 h-2/3 mx-auto" />
                         <h3>Add new to-do</h3>
