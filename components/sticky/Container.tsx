@@ -1,4 +1,4 @@
-import React, { useCallback, Dispatch, SetStateAction, useState, useEffect } from 'react';
+import { useCallback, Dispatch, SetStateAction, useState } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -16,9 +16,6 @@ import SortableItem from './SortableItem';
 import Item from './Item';
 import { moveSticky } from '@/utils/apiCalls';
 import { toast } from 'react-hot-toast';
-import { allDatas } from './datasType';
-import useSWRSubscription from 'swr/subscription'
-import { subscribeTodaySticky } from '@/utils/service';
 
 type FromToType = {
     sequence: number;
@@ -26,9 +23,8 @@ type FromToType = {
 }
 
 type StickyProps = {
-    activeData: stickyDataType | null;
-    setActiveData: Dispatch<SetStateAction<stickyDataType | null>>;
-    initialData: stickyDataType[] | null;
+    todos: stickyDataType[] | null;
+    setTodos: Dispatch<SetStateAction<stickyDataType[] | null>>;
 }
 
 function AddNewSticky({ loading = false }: { loading?: boolean }) {
@@ -48,13 +44,14 @@ function AddNewSticky({ loading = false }: { loading?: boolean }) {
 }
 
 
-export default function Container({ activeData, setActiveData, initialData }: StickyProps) {
-    const [todos, setTodos] = useState(initialData);
+export default function Container({ todos, setTodos }: StickyProps) {
     const [error, setError] = useState(false);
+    const [activeData, setActiveData] = useState<stickyDataType | null>(null);
 
     if (error) {
         toast.error("Error happened when retreiving your sticky. Sorry");
     };
+
     const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -90,7 +87,7 @@ export default function Container({ activeData, setActiveData, initialData }: St
         }
         setActiveData(null);
         // Make API call to save data here
-    }, [todos, setActiveData, moveStickyData]);
+    }, [todos, setActiveData, moveStickyData, setTodos]);
 
     const handleDragCancel = useCallback(() => {
         setActiveData(null);

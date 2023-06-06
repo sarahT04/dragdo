@@ -1,18 +1,18 @@
 "use client"
-import { useState } from "react";
 import Navbar from "@components/Navbar";
 import StickyModal from "@components/modal/Sticky";
 import Sticky from "@components/sticky/Container";
 import ModalProvider from "@components/context/modal";
 import { Toaster } from "react-hot-toast";
+import StickyProvider from "@/components/context/todos";
+import { useState } from "react";
 
 type HomeProps = {
   initialData: stickyDataType[] | null;
 }
 
 export default function Homepage({ initialData }: HomeProps) {
-  const [activeData, setActiveData] = useState<stickyDataType | null>(null);
-
+  const [todos, setTodos] = useState<stickyDataType[] | null>(initialData);
   return (
     <>
       <Navbar />
@@ -22,13 +22,16 @@ export default function Homepage({ initialData }: HomeProps) {
         containerClassName="mb-6"
       />
       <ModalProvider>
-        <main className="flex">
-          <Sticky
-            initialData={initialData}
-            activeData={activeData} setActiveData={setActiveData}
-          />
-          <StickyModal />
-        </main>
+        <StickyProvider>
+          <main className="flex">
+            <Sticky
+              todos={todos} setTodos={setTodos}
+            />
+            <StickyModal
+              todos={todos} setTodos={setTodos}
+            />
+          </main>
+        </StickyProvider>
       </ModalProvider>
     </>
   )

@@ -53,11 +53,6 @@ function todosReducer(todos: stickyDataType[], action: todoAction) {
 
 export default function StickyProvider({ children }: { children: ReactNode }) {
     // const initialData: stickyDataType[] = allDatas
-    // const [todos, dispatch] = useReducer(todosReducer, initialData);
-    const { closeModal, openModal } = useContext(ModalContext)!;
-
-    // All todos
-    const [todos, setTodos] = useState<stickyDataType[]>(allDatas);
     // For editing / creating new purpose and also for dragging purpose
     const [modalData, setModalData] = useState<ModalDataType | null>(null);
     // Modal for edit / create form
@@ -72,9 +67,8 @@ export default function StickyProvider({ children }: { children: ReactNode }) {
 
     return (
         <StickyContext.Provider value={{
-            // todos, setTodos,
             modalData, setModalData,
-            editTodo,
+            // editTodo,
             // newTodo, editTodo, deleteTodo,
         }}>
             {children}

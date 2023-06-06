@@ -1,5 +1,6 @@
 const headers = { 'Content-Type': 'application/json' };
 
+// async function 
 
 async function moveSticky(from: moveStickyProps, to: moveStickyProps) {
     try {
@@ -58,8 +59,8 @@ async function pin(id: string) {
 }
 
 export {
-    unpin,
-    pin,
+    // unpin,
+    // pin,
     fetchTodaySticky,
     moveSticky
 }

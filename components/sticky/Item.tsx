@@ -1,12 +1,14 @@
-import React, { forwardRef, HTMLAttributes, useCallback, useState } from 'react';
+import React, { forwardRef, HTMLAttributes, useCallback, useContext, useState } from 'react';
 import Importance from '../rating/Importance';
 import ItemDropdown from '../dropdown/ItemDropdown';
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/20/solid';
 import { Transition } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import { pin, unpin } from '@/utils/apiCalls';
 import toast from 'react-hot-toast';
 import { formatDateTime } from '@/utils/utils';
+import { unpin, pin } from '@/utils/service';
+import { ModalContext } from '../context/modal';
+import { StickyContext } from '../context/todos';
 
 export type ItemProps = HTMLAttributes<HTMLDivElement> & {
     id: string;
@@ -18,26 +20,34 @@ export type ItemProps = HTMLAttributes<HTMLDivElement> & {
 
 // eslint-disable-next-line react/display-name
 const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDragging, className, noMenu = false, item, ...props }, ref) => {
+    const { openModal } = useContext(ModalContext)!;
+    const { setModalData } = useContext(StickyContext)!;
     const { title, body, created, updated, color, pinned: userPinned, importance } = item || {};
     const [pinned, setPinned] = useState(userPinned);
     const [updatedUpdated, setUpdatedUpdated] = useState(updated);
 
     const handlePinApi = useCallback(async (id: string) => {
-        if (!pinned) {
+        if (pinned) {
             return await unpin(id);
         }
         return await pin(id);
     }, [pinned]);
 
     const handlePin = () => {
-        if (!pinned) {
+        setPinned(true);
+        if (pinned) {
             setPinned(false);
         }
-        setPinned(true);
         handlePinApi(id);
     };
 
-    const handleEditApi = useCallback
+    const onEdit = () => {
+        const todo = {
+            pTitle: title, pBody: body, pImportance: importance, pColor: color, pPinned: pinned, pDeadline: 'never',
+        }
+        setModalData(todo);
+        openModal();
+    }
 
     return (
         <section className={`${withOpacity ? "opacity-50" : "opacity-100"} p-2
@@ -80,6 +90,8 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                                 <LockOpenIcon className='w-6 h-6 mt-1' title="Pin this to-do" onClick={handlePin} />
                                 <ItemDropdown
                                     created={created!}
+                                    onEdit={onEdit}
+                                    onDelete={openModal}
                                 />
                             </div>
                         </Transition>

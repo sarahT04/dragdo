@@ -6,6 +6,8 @@ import { StickyContext } from '../context/todos';
 
 type ItemDropdownProps = {
     created: string;
+    onEdit: () => void;
+    onDelete: () => void;
 }
 
 type DropdownItemProps = {
@@ -22,9 +24,7 @@ function DropdownItem({ children, title, onClick }: DropdownItemProps) {
     )
 }
 
-function ItemDropdown({ created }: ItemDropdownProps) {
-    const { openModal } = useContext(ModalContext)!;
-    const { setModalData } = useContext(StickyContext!);
+function ItemDropdown({ onEdit, onDelete, created }: ItemDropdownProps) {
     return (
         <div className="block relative">
             <Menu>
@@ -38,10 +38,10 @@ function ItemDropdown({ created }: ItemDropdownProps) {
                     leaveTo="transform scale-95 opacity-0"
                 >
                     <Menu.Items className="absolute right-0 dark-mode py-2 px-3 rounded-lg">
-                        <DropdownItem title="Edit to-do" onClick={openModal}>
+                        <DropdownItem title="Edit to-do" onClick={onEdit}>
                             <PencilSquareIcon className="w-4 h-4" /><p>Edit</p>
                         </DropdownItem>
-                        <DropdownItem title="Delete to-do" onClick={openModal}>
+                        <DropdownItem title="Delete to-do" onClick={onDelete}>
                             <TrashIcon className="w-4 h-4" /><p>Delete</p>
                         </DropdownItem>
                         <hr className="my-1" />

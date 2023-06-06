@@ -5,10 +5,10 @@ import Success from '../buttons/Success';
 import Alert from '../buttons/Alert';
 
 type ColorPickerModalTypes = {
-    color: string | null;
+    color: string | null | undefined;
     open: boolean;
     onClose: () => void;
-    setColor: React.Dispatch<SetStateAction<string | null>>;
+    setColor: React.Dispatch<SetStateAction<string | null | undefined>>;
 }
 
 export default function ColorPickerModal({ color, open, onClose, setColor }: ColorPickerModalTypes) {
@@ -40,7 +40,7 @@ export default function ColorPickerModal({ color, open, onClose, setColor }: Col
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="flex justify-between w-2/5 max-w-md transform overflow-hidden rounded-2xl p-8 text-left align-middle shadow-xl transition-all inverse-dark-mode">
+                                <Dialog.Panel className="flex justify-between w-full max-w-md transform overflow-hidden rounded-2xl p-8 text-left align-middle shadow-xl transition-all inverse-dark-mode">
                                     <ChromePicker
                                         color={color ? color : undefined}
                                         onChange={(clr: { hex: string }) => setColor(clr.hex)}
