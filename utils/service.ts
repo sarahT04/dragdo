@@ -1,4 +1,3 @@
-// import * as admin from 'firebase-admin';
 import { formatDateTime, handleSort } from './utils';
 import { initializeApp } from "firebase/app";
 import { collection, doc, getDocs, getFirestore, query, setDoc, updateDoc, where, serverTimestamp, addDoc } from "firebase/firestore";
@@ -53,28 +52,36 @@ function pin(id: string) {
     return editPinned(id, true);
 }
 
-async function createTodoDb(todo: AddDataType) {
+async function createTodoDb(todo: AddDataType, email: string) {
     try {
-        // const timestamp = new Date()
+        delete todo.id;
+        const timestamp = formatDateTime(new Date());
         const res = await addDoc(collection(db, "sticky"), {
             ...todo,
+            email,
+            // Gotta refactor this for datetime format :3
             created: serverTimestamp(),
             updated: serverTimestamp(),
         })
-        return { ...todo, id: res.id }; // created: timestamp, updated: timestamp 
+        return { ...todo, id: res.id, updated: timestamp, created: timestamp };
     } catch (e) {
         console.log(e)
         return false;
     };
 }
 
-async function setTodoDb(todo: AddDataType) {
+async function updateTodoDb(todo: AddDataType, email: string) {
     try {
-        await setDoc(doc(db, "sticky", todo.id!), {
+        const id = todo.id!;
+        delete todo.id;
+        const updated = formatDateTime(new Date());
+        await updateDoc(doc(db, "sticky", id), {
             ...todo,
+            email,
             updated: serverTimestamp(),
         })
-        return true;
+        // Gotta refactor this for datetime format :3
+        return { ...todo, id, updated };
     } catch (e) {
         console.log(e)
         return false;
@@ -111,7 +118,7 @@ async function getTodaySticky({ email }: { email: string | null }) {
 
 export {
     sticky,
-    setTodoDb,
+    updateTodoDb,
     getTodaySticky,
     unpin,
     pin,

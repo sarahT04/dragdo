@@ -8,6 +8,9 @@ export default async function IndexPage() {
     const { email } = session!.user!;
     const initialData = await getTodaySticky({ email: email! });
     return (
-        <Homepage initialData={initialData} />
+        <Homepage
+            initialData={initialData}
+            email={email!}
+        />
     )
 }

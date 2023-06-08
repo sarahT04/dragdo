@@ -9,18 +9,18 @@ import { useTheme } from 'next-themes';
 import { ModalContext } from '../context/modal';
 import { enterPressed, returnNullIfNotString } from '@/utils/utils';
 import { toast } from 'react-hot-toast';
-import { createTodoDb, setTodoDb } from '@/utils/service';
+import { createTodoDb, updateTodoDb } from '@/utils/service';
 
 const DARK_COLOR = "#1e293b";
 const LIGHT_COLOR = "#cbd5e1";
 const shouldChangeColor = (color: string | null | undefined) => typeof color === 'string' && (color !== DARK_COLOR && color !== LIGHT_COLOR);
 const makeSureItsString = (str: string | null | undefined) => typeof str !== 'string' ? "" : str;
 
-export default function StickyModal({ todos, setTodos }: StickyProps) {
+export default function StickyModal({ todos, setTodos, email }: StickyProps & { email: string; }) {
     const { modalOpen, closeModal, modalData } = useContext(ModalContext)!;
     const { data, type } = modalData || {};
     const isEdit = type === 'edit';
-    const { pId, pTitle, pBody, pImportance, pColor, pPinned, pDeadline } = data || {};
+    const { pId, pTitle, pBody, pImportance, pColor, pPinned, pDeadline, pSequence } = data || {};
     const { theme } = useTheme();
     // Utility state
     const [pickerVisible, setPickerVisible] = useState(false);
@@ -35,11 +35,12 @@ export default function StickyModal({ todos, setTodos }: StickyProps) {
 
     // Utilities below
     const openPicker = () => {
-        if (theme === 'dark') {
-            setColor(DARK_COLOR);
-        } else {
+        if (color === null) {
             setColor(LIGHT_COLOR);
-        }
+            if (theme === 'dark') {
+                setColor(DARK_COLOR);
+            }
+        };
         setPickerVisible(true)
     };
     const closePicker = () => setPickerVisible(false);
@@ -68,26 +69,28 @@ export default function StickyModal({ todos, setTodos }: StickyProps) {
             color: returnNullIfNotString(color),
             pinned: pinned === undefined ? false : pinned,
             importance: importance === undefined ? 0 : importance,
-            sequence: (todos === null ? 1 : todos.length + 1),
+            // Current bug: if sequence exists 
+            sequence: (isEdit ? (pSequence === undefined ? 0 : pSequence) : (todos === null ? 1 : todos.length + 1)),
             done: false,
             deadline: "never",
             // Add created here
         };
-
-        let handlerFunction = createTodoDb(todo);
+        let handlerFunction = createTodoDb;
         if (isEdit) {
-            handlerFunction = setTodoDb(todo);
+            handlerFunction = updateTodoDb;
         }
         toast.promise(
-            handlerFunction,
+            handlerFunction(todo, email),
             {
                 loading: `${isEdit ? "Editing" : "Adding"} your to-do...`,
                 success: (data) => {
-                    console.log(data);
+                    if (data === false) throw Error;
                     if (todos === null) {
                         setTodos([data]);
                     } else {
-                        setTodos([...todos, data])
+                        const newTodos = todos.filter((todo) => todo.id !== pId);
+                        console.log(newTodos, data);
+                        setTodos([...newTodos, data])
                     }
                     closeModal()
                     return `${isEdit ? "Edited" : "Added"} your to-do!`
@@ -152,10 +155,11 @@ export default function StickyModal({ todos, setTodos }: StickyProps) {
                                     />
                                     <textarea
                                         className="mt-2 w-full p-2 h-40 border-2 rounded-lg my-1 resize-none inverse-dark-mode placeholder:inverse-dark-mode"
-                                        placeholder="What should you put on your sticky?"
+                                        placeholder={error.error ? error.message : "What should you put on your sticky?"}
                                         id="sticky-body"
                                         onChange={(e) => setBody(e.target.value)}
                                         value={makeSureItsString(body)}
+                                        style={error.error ? { border: '1px solid red' } : undefined}
                                     />
                                     <div className="flex justify-between mt-3">
                                         <Importance importance={0} />

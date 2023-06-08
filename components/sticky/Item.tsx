@@ -19,9 +19,8 @@ export type ItemProps = HTMLAttributes<HTMLDivElement> & {
 // eslint-disable-next-line react/display-name
 const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDragging, className, noMenu = false, item, ...props }, ref) => {
     const { openModal, setModalData } = useContext(ModalContext)!;
-    const { title, body, created, updated, color, pinned: userPinned, importance } = item || {};
+    const { title, body, created, updated, color, pinned: userPinned, importance, sequence } = item || {};
     const [pinned, setPinned] = useState(userPinned);
-    const [updatedUpdated, setUpdatedUpdated] = useState(updated);
 
     const handlePinApi = useCallback(async (id: string) => {
         if (pinned) {
@@ -49,6 +48,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                 pColor: returnNullIfNotString(color),
                 pPinned: typeof pinned !== 'boolean' ? false : pinned,
                 pDeadline: 'never' as "never",
+                pSequence: sequence === undefined ? 0 : sequence,
             }
         }
         setModalData(todo);
@@ -66,6 +66,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                 pColor: null,
                 pPinned: false,
                 pDeadline: 'never' as "never",
+                pSequence: sequence === undefined ? 0 : sequence + 1,
             }
         }
         setModalData(todo);
@@ -79,6 +80,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
         ${noMenu ? "cursor-pointer" : ""}
         flex flex-col ${className ? className : ''}`}
             ref={ref} {...props}
+            style={color ? { backgroundColor: color } : undefined}
         >
             {
                 noMenu || item === undefined
@@ -138,7 +140,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
                         </div>
                         <div className="mt-auto inline-flex w-full py-2 px-4 items-center justify-between self-end">
                             <Importance importance={importance!} />
-                            {updatedUpdated}
+                            {updated}
                         </div>
                     </>
             }

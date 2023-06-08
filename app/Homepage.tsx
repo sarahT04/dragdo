@@ -8,10 +8,12 @@ import { useState } from "react";
 
 type HomeProps = {
   initialData: stickyDataType[] | null;
+  email: string;
 }
 
-export default function Homepage({ initialData }: HomeProps) {
+export default function Homepage({ initialData, email }: HomeProps) {
   const [todos, setTodos] = useState<stickyDataType[] | null>(initialData);
+
   return (
     <>
       <Navbar />
@@ -27,6 +29,7 @@ export default function Homepage({ initialData }: HomeProps) {
             />
             <StickyModal
               todos={todos} setTodos={setTodos}
+              email={email}
             />
           </main>
       </ModalProvider>

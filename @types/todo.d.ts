@@ -1,3 +1,5 @@
+type ImportanceType = (0 | 1 | 2 | 3 | 4 | 5);
+
 type stickyDataType = {
     id: string;
     title: string | null;
@@ -6,7 +8,7 @@ type stickyDataType = {
     updated: string;
     color: string | null;
     pinned: boolean;
-    importance: (0 | 1 | 2 | 3 | 4 | 5);
+    importance: ImportanceType;
     sequence: number;
     done: boolean;
     deadline: Date | 'never';
@@ -18,20 +20,21 @@ type ModalDataType = {
         pId: string | null;
         pTitle: string | null;
         pBody: string | null;
-        pImportance: (0 | 1 | 2 | 3 | 4 | 5);
         pColor: string | null;
         pPinned: boolean;
-        pDeadline: Date | 'never',
+        pImportance: ImportanceType;
+        pSequence: number;
+        pDeadline: Date | 'never';
     }
 };
 
 type AddDataType = {
-    id: string | null;
+    id?: string | null;
     title: string | null;
     body: string;
     color: string | null;
     pinned: boolean;
-    importance: (0 | 1 | 2 | 3 | 4 | 5);
+    importance: ImportanceType;
     sequence: number;
     done: boolean;
     deadline: Date | 'never';
