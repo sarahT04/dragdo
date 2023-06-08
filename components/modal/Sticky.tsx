@@ -89,7 +89,6 @@ export default function StickyModal({ todos, setTodos, email }: StickyProps & { 
                         setTodos([data]);
                     } else {
                         const newTodos = todos.filter((todo) => todo.id !== pId);
-                        console.log(newTodos, data);
                         setTodos([...newTodos, data])
                     }
                     closeModal()

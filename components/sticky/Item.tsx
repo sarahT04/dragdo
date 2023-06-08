@@ -80,7 +80,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(({ id, withOpacity, isDraggin
         ${noMenu ? "cursor-pointer" : ""}
         flex flex-col ${className ? className : ''}`}
             ref={ref} {...props}
-            style={color ? { backgroundColor: color } : undefined}
+            style={color ? { backgroundColor: color, ...props.style } : { ...props.style }}
         >
             {
                 noMenu || item === undefined

@@ -51,7 +51,6 @@ export default function Container({ todos, setTodos }: StickyProps) {
     const handleDragStart = useCallback((event: DragStartEvent) => {
         const currentActiveData = todos!.find((item) => item.id === event.active.id);
         setActiveData(currentActiveData ? currentActiveData : null);
-        console.log(currentActiveData);
     }, [todos, setActiveData]);
 
     const moveStickyData = useCallback(async (from: FromToType, to: FromToType) => {
